@@ -1,0 +1,47 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            Please review this pull request. Analyze the changes for:
+            - Code quality (readability, naming, structure)
+            - Bugs (logic errors, edge cases, null checks)
+            - Performance (inefficient patterns)
+            - Security (injection risks, auth issues, exposed secrets)
+
+            Post your review as a PR comment using this format:
+            ## Code Review
+
+            ### Summary
+            [Brief description of what the PR does]
+
+            ### Code Quality
+            [Findings]
+
+            ### Bugs
+            [Findings]
+
+            ### Performance
+            [Findings]
+
+            ### Security
+            [Findings]
+
+            ### Suggestions
+            [Numbered list of recommendations]
+
+            Overall: [Approve / Approve with suggestions / Request changes]
